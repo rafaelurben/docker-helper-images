@@ -18,7 +18,7 @@ jobs:
       matrix:
         include:
           - folder: jenkins-agent
-            image_name: jenkins-agent
+            image_name: rafaelurben/jenkins-agent
  
     env:
       REGISTRY: ghcr.io
@@ -49,6 +49,9 @@ jobs:
         uses: docker/metadata-action@v5.0.0
         with:
           images: ${{ env.REGISTRY }}/${{ matrix.image_name }}
+          tags: |
+            latest
+            ${{ github.sha }}
 
       - name: Build and push Docker image
         id: build-and-push
