@@ -11,6 +11,12 @@ RUN wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sona
     unzip /tmp/sonar-scanner.zip -d /tmp/sonar-scanner && \
     mv /tmp/sonar-scanner/sonar-scanner-7.2.0.5079-linux-x64 /opt/sonar-scanner
 ENV PATH="${PATH}:/opt/sonar-scanner/bin"
+# Install JMeter
+RUN wget -q https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz -O /tmp/jmeter.tgz && \
+    tar -xzf /tmp/jmeter.tgz -C /opt/ && \
+    mv /opt/apache-jmeter-5.6.3 /opt/jmeter && \
+    rm /tmp/jmeter.tgz
+ENV PATH="${PATH}:/opt/jmeter/bin"
 # Install Google Chrome
 RUN wget -qO - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     echo 'deb [arch=amd64] https://dl.google.com/linux/deb/ stable main' > /etc/apt/sources.list.d/google.list && \
