@@ -4,11 +4,11 @@ FROM jenkins/agent:bookworm-jdk21
 USER root
 
 # Install additional tools: Maven, Node.js, npm, wget, unzip, gnupg2
-RUN apt-get update && apt-get install -y maven nodejs npm wget unzip gnupg2
+RUN apt-get update -qq && apt-get install -y -qq maven nodejs npm wget unzip gnupg2
 
 # Install Sonar Scanner
 RUN wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.2.0.5079-linux-x64.zip -O /tmp/sonar-scanner.zip && \
-    unzip /tmp/sonar-scanner.zip -d /tmp/sonar-scanner && \
+    unzip -q /tmp/sonar-scanner.zip -d /tmp/sonar-scanner && \
     mv /tmp/sonar-scanner/sonar-scanner-7.2.0.5079-linux-x64 /opt/sonar-scanner
 ENV PATH="${PATH}:/opt/sonar-scanner/bin"
 # Install JMeter
@@ -20,7 +20,7 @@ ENV PATH="${PATH}:/opt/jmeter/bin"
 # Install Google Chrome
 RUN wget -qO - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     echo 'deb [arch=amd64] https://dl.google.com/linux/deb/ stable main' > /etc/apt/sources.list.d/google.list && \
-    apt-get update && apt-get install -y google-chrome-stable && \
+    apt-get update -qq && apt-get install -y -qq google-chrome-stable && \
     google-chrome --version
 
 # Clean up
