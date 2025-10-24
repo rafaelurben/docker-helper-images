@@ -14,7 +14,8 @@ ENV PATH="${PATH}:/opt/sonar-scanner/bin"
 # Install JMeter
 RUN wget -q https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz -O /tmp/jmeter.tgz && \
     tar -xzf /tmp/jmeter.tgz -C /opt/ && \
-    mv /opt/apache-jmeter-5.6.3 /opt/jmeter
+    mv /opt/apache-jmeter-5.6.3 /opt/jmeter && \
+    rm /tmp/jmeter.tgz
 ENV PATH="${PATH}:/opt/jmeter/bin"
 # Install Google Chrome
 RUN wget -qO - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
