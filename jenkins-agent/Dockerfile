@@ -30,13 +30,15 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
     echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" > /etc/apt/sources.list.d/docker.list && \
     apt-get update -qq && apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin && \
     docker --version
-# Install Docker Scout
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh -o install-scout.sh)" && \
-    mkdir ~/.docker && \
-    sh install-scout.sh && \
-    docker scout version
 
 # Clean up
 RUN apt-get clean && rm -rf /tmp/* /var/tmp/*
 # Switch back to the jenkins user
 USER jenkins
+
+# Install Docker Scout
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh -o install-scout.sh)" && \
+    mkdir ~/.docker && \
+    sh install-scout.sh && \
+    rm install-scout.sh && \
+    docker scout version
