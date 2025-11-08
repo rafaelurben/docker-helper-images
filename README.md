@@ -6,7 +6,7 @@ This repository contains a collection of Docker helper images that can be used a
 
 - **jenkins-agent**: A Docker image for running Jenkins agents.
   - Extends `jenkins/agent:bookwork-jdk21`
-  - Includes additional tools: `mvn`, `nodejs`, `npm`, `wget`, `unzip`, `gnupg2`, `sonar-scanner`, `jmeter`, `google-chrome`.
+  - Includes additional tools: `mvn`, `nodejs`, `npm`, `wget`, `unzip`, `gnupg2`, `sonar-scanner`, `jmeter`, `google-chrome`, `docker`, `docker-scout`.
   - [Dockerfile](./jenkins-agent/Dockerfile)
   - [GitHub Container Registry](https://github.com/users/rafaelurben/packages/container/package/jenkins-agent)
   - Image: `ghcr.io/rafaelurben/jenkins-agent:latest`
