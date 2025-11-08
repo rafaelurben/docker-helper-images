@@ -35,14 +35,8 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/
     mkdir ~/.docker && \
     sh install-scout.sh && \
     docker scout version
-# Prepare Docker rootless
-RUN apt-get install -y -qq kmod && /usr/sbin/modprobe nf_tables
 
 # Clean up
 RUN apt-get clean && rm -rf /tmp/* /var/tmp/*
 # Switch back to the jenkins user
 USER jenkins
-
-# Setup docker in docker (rootless)
-RUN dockerd-rootless-setuptool.sh install && \
-    docker info
