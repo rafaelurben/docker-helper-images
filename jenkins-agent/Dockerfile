@@ -3,8 +3,8 @@ FROM jenkins/agent:bookworm-jdk21
 
 USER root
 
-# Install additional tools: Maven, Node.js, npm, wget, unzip, gnupg2, ca-certificates, curl, uidmap, iproute2
-RUN apt-get update -qq && apt-get install -y -qq maven nodejs npm wget unzip gnupg2 ca-certificates curl uidmap iproute2
+# Install additional tools: Maven, Node.js, npm, wget, unzip, gnupg2, ca-certificates, curl, uidmap, iproute2, jq
+RUN apt-get update -qq && apt-get install -y -qq maven nodejs npm wget unzip gnupg2 ca-certificates curl uidmap iproute2 jq
 
 # Install Sonar Scanner
 RUN wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.2.0.5079-linux-x64.zip -O /tmp/sonar-scanner.zip && \
