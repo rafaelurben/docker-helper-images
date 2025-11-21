@@ -32,9 +32,6 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
     echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" > /etc/apt/sources.list.d/docker.list && \
     apt-get update -qq && apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin && \
     docker --version
-# Allow the Jenkins user to use Docker (GID should match "stat -c '%g' /var/run/docker.sock")
-RUN groupadd -g 988 docker || true && \
-    usermod -aG docker jenkins
 
 # Clean up
 RUN apt-get clean && rm -rf /tmp/* /var/tmp/*
