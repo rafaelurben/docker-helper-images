@@ -10,3 +10,10 @@ This repository contains a collection of Docker helper images that can be used a
   - [Dockerfile](./jenkins-agent/Dockerfile)
   - [GitHub Container Registry](https://github.com/users/rafaelurben/packages/container/package/jenkins-agent)
   - Image: `ghcr.io/rafaelurben/jenkins-agent:latest`
+
+- **node25-trixie-with-jdk25**: A Docker image based on Node.js 25 (Debian Trixie) with OpenJDK 25 headless preinstalled.
+  - Extends `node:25-trixie`
+  - Includes: `openjdk-25-jdk-headless`
+  - [Dockerfile](./node25-trixie-with-jdk25/Dockerfile)
+  - [GitHub Container Registry](https://github.com/users/rafaelurben/packages/container/package/node25-trixie-with-jdk25)
+  - Image: `ghcr.io/rafaelurben/node25-trixie-with-jdk25:latest`
