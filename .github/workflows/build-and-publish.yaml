@@ -8,7 +8,48 @@ on:
     branches: [ "main" ]
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      images: ${{ steps.set-matrix.outputs.images }}
+      has_changes: ${{ steps.set-matrix.outputs.has_changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Detect changed image folders
+        id: changed
+        uses: dorny/paths-filter@de90cc6fb38f6f4c4143a0882a3de4f640a0b904 # v3.0.2
+        with:
+          filters: |
+            jenkins_agent:
+              - 'jenkins-agent/**'
+            node25_trixie_with_jdk25:
+              - 'node25-trixie-with-jdk25/**'
+
+      - name: Build dynamic matrix
+        id: set-matrix
+        run: |
+          entries=()
+          if [[ "${{ steps.changed.outputs.jenkins_agent }}" == "true" ]]; then
+            entries+=('{"folder":"jenkins-agent","image_name":"rafaelurben/jenkins-agent"}')
+          fi
+          if [[ "${{ steps.changed.outputs.node25_trixie_with_jdk25 }}" == "true" ]]; then
+            entries+=('{"folder":"node25-trixie-with-jdk25","image_name":"rafaelurben/node25-trixie-with-jdk25"}')
+          fi
+
+          if [[ ${#entries[@]} -eq 0 ]]; then
+            echo 'images={"include":[]}' >> "$GITHUB_OUTPUT"
+            echo 'has_changes=false' >> "$GITHUB_OUTPUT"
+          else
+            matrix="$(printf '%s\n' "${entries[@]}" | jq -s '{include: .}')"
+            echo "images=${matrix}" >> "$GITHUB_OUTPUT"
+            echo 'has_changes=true' >> "$GITHUB_OUTPUT"
+          fi
+
   build-and-publish:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,12 +58,7 @@ jobs:
     
     strategy:
       fail-fast: false 
-      matrix:
-        include:
-          - folder: jenkins-agent
-            image_name: rafaelurben/jenkins-agent
-          - folder: node25-trixie-with-jdk25
-            image_name: rafaelurben/node25-trixie-with-jdk25
+      matrix: ${{ fromJSON(needs.detect-changes.outputs.images) }}
  
     env:
       REGISTRY: ghcr.io
