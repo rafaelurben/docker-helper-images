@@ -7,6 +7,9 @@ on:
   push:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
@@ -22,30 +25,31 @@ jobs:
         uses: dorny/paths-filter@de90cc6fb38f6f4c4143a0882a3de4f640a0b904 # v3.0.2
         with:
           filters: |
-            jenkins_agent:
+            jenkins-agent:
               - 'jenkins-agent/**'
-            node25_trixie_with_jdk25:
+            node25-trixie-with-jdk25:
               - 'node25-trixie-with-jdk25/**'
 
       - name: Build dynamic matrix
         id: set-matrix
         run: |
-          entries=()
-          if [[ "${{ steps.changed.outputs.jenkins_agent }}" == "true" ]]; then
-            entries+=('{"folder":"jenkins-agent","image_name":"rafaelurben/jenkins-agent"}')
+          matrix='{"include":['
+          separator=''
+          has_changes='false'
+          if [[ "${{ steps.changed.outputs['jenkins-agent'] }}" == "true" ]]; then
+            matrix+="${separator}{\"folder\":\"jenkins-agent\",\"image_name\":\"rafaelurben/jenkins-agent\"}"
+            separator=','
+            has_changes='true'
           fi
-          if [[ "${{ steps.changed.outputs.node25_trixie_with_jdk25 }}" == "true" ]]; then
-            entries+=('{"folder":"node25-trixie-with-jdk25","image_name":"rafaelurben/node25-trixie-with-jdk25"}')
+          if [[ "${{ steps.changed.outputs['node25-trixie-with-jdk25'] }}" == "true" ]]; then
+            matrix+="${separator}{\"folder\":\"node25-trixie-with-jdk25\",\"image_name\":\"rafaelurben/node25-trixie-with-jdk25\"}"
+            separator=','
+            has_changes='true'
           fi
+          matrix+=']}'
 
-          if [[ ${#entries[@]} -eq 0 ]]; then
-            echo 'images={"include":[]}' >> "$GITHUB_OUTPUT"
-            echo 'has_changes=false' >> "$GITHUB_OUTPUT"
-          else
-            matrix="$(printf '%s\n' "${entries[@]}" | jq -s '{include: .}')"
-            echo "images=${matrix}" >> "$GITHUB_OUTPUT"
-            echo 'has_changes=true' >> "$GITHUB_OUTPUT"
-          fi
+          echo "images=${matrix}" >> "$GITHUB_OUTPUT"
+          echo "has_changes=${has_changes}" >> "$GITHUB_OUTPUT"
 
   build-and-publish:
     needs: detect-changes
