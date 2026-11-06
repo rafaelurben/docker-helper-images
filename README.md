@@ -17,3 +17,8 @@ This repository contains a collection of Docker helper images that can be used a
   - [Dockerfile](./node25-trixie-with-jdk25/Dockerfile)
   - [GitHub Container Registry](https://github.com/users/rafaelurben/packages/container/package/node25-trixie-with-jdk25)
   - Image: `ghcr.io/rafaelurben/node25-trixie-with-jdk25:latest`
+
+- **node26-alpine-with-jdk25**: A Docker image based on Node.js 26 (Alpine) with OpenJDK 25 headless preinstalled.
+  - [Dockerfile](./node26-alpine-with-jdk25/Dockerfile)
+  - [GitHub Container Registry](https://github.com/users/rafaelurben/packages/container/package/node26-alpine-with-jdk25)
+  - Image: `ghcr.io/rafaelurben/node26-alpine-with-jdk25:latest`

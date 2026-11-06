@@ -6,5 +6,9 @@
   {
     "path": "node25-trixie-with-jdk25",
     "image_name": "rafaelurben/node25-trixie-with-jdk25"
+  },
+  {
+    "path": "node26-alpine-with-jdk25",
+    "image_name": "rafaelurben/node26-alpine-with-jdk25"
   }
 ]
