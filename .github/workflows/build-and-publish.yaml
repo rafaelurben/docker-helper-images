@@ -7,8 +7,64 @@ on:
   push:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      images: ${{ steps.set-matrix.outputs.images }}
+      has_changes: ${{ steps.set-matrix.outputs.has_changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Build dynamic matrix from image config
+        id: set-matrix
+        run: |
+          CONFIG_FILE='images.json'
+
+          if [[ ! -f "$CONFIG_FILE" ]]; then
+            echo "Config file not found: $CONFIG_FILE" >&2
+            exit 1
+          fi
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            matrix="$(jq -c '{include: [ .[] | {folder: .path, image_name: .image_name} ]}' "$CONFIG_FILE")"
+          else
+            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              base_sha="${{ github.event.pull_request.base.sha }}"
+              head_sha="${{ github.event.pull_request.head.sha }}"
+            else
+              base_sha="${{ github.event.before }}"
+              head_sha="${{ github.sha }}"
+            fi
+
+            if [[ -z "$base_sha" || "$base_sha" == "0000000000000000000000000000000000000000" ]]; then
+              changed_files="$(git ls-files)"
+            else
+              changed_files="$(git diff --name-only "$base_sha" "$head_sha")"
+            fi
+
+            files_json="$(printf '%s\n' "$changed_files" | sed '/^$/d' | jq -R . | jq -s .)"
+            matrix="$(jq -c --argjson files "$files_json" '{include: [ .[] as $image | select(any($files[]; startswith($image.path + "/"))) | {folder: $image.path, image_name: $image.image_name} ]}' "$CONFIG_FILE")"
+          fi
+
+          if [[ "$(jq '.include | length' <<<"$matrix")" -gt 0 ]]; then
+            has_changes='true'
+          else
+            has_changes='false'
+          fi
+
+          echo "images=${matrix}" >> "$GITHUB_OUTPUT"
+          echo "has_changes=${has_changes}" >> "$GITHUB_OUTPUT"
+
   build-and-publish:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,12 +73,7 @@ jobs:
     
     strategy:
       fail-fast: false 
-      matrix:
-        include:
-          - folder: jenkins-agent
-            image_name: rafaelurben/jenkins-agent
-          - folder: node25-trixie-with-jdk25
-            image_name: rafaelurben/node25-trixie-with-jdk25
+      matrix: ${{ fromJSON(needs.detect-changes.outputs.images) }}
  
     env:
       REGISTRY: ghcr.io
