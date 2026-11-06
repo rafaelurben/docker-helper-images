@@ -1,0 +1,10 @@
+[
+  {
+    "path": "jenkins-agent",
+    "image_name": "rafaelurben/jenkins-agent"
+  },
+  {
+    "path": "node25-trixie-with-jdk25",
+    "image_name": "rafaelurben/node25-trixie-with-jdk25"
+  }
+]
